@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   al_test:
-    build: /
+    build: ./
     ports:
      - 5001:80
   postgresql:
@@ -9,7 +9,7 @@ services:
     volumes:
       - postgresql-data:/bitnami/postgresql
     ports:
-      - "5446:5432"
+      - "5446:5433"
     environment:
       - POSTGRESQL_DATABASE=al-test-3
       - POSTGRESQL_USERNAME=superuser

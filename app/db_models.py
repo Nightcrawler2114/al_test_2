@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
-from app.db import Base
+from app.settings import app
 
 
-class Wallet(Base):
+class Wallet(app.state.Base):
 
     __tablename__ = "wallets"
 
@@ -16,7 +16,7 @@ class Wallet(Base):
         return f'Wallet: "{self.name}/{self.id}"; Available funds: {self.balance}'
 
 
-class TransactionRequest(Base):
+class TransactionRequest(app.state.Base):
 
     __tablename__ = 'requests'
 

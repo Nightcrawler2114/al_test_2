@@ -7,9 +7,9 @@ from .settings import COMMISSION
 
 class MakeTransactionHanler():
 
-    def handle(self, sender_id: int, recipient_id: int, amount: float, db: Session) -> dict:
+    def handle(self, sender_id: int, recipient_id: int, amount: float, session: Session) -> dict:
 
-        data = self._collect_data(sender_id, recipient_id, amount, db)
+        data = self._collect_data(sender_id, recipient_id, amount, session)
 
         errors = self._validate(data)
 
@@ -19,11 +19,11 @@ class MakeTransactionHanler():
 
         return self._make_transaction(data)
 
-    def _collect_data(self, sender_id: int, recipient_id: int, amount: float, db: Session) -> dict:
+    def _collect_data(self, sender_id: int, recipient_id: int, amount: float, session: Session) -> dict:
 
         data = {
             'amount': amount,
-            'session': db
+            'session': session
         }
 
         data['sender'] = data['session'].query(Wallet).filter_by(id=sender_id).first() 
@@ -46,7 +46,9 @@ class MakeTransactionHanler():
     def _make_transaction(self, data: dict) -> dict:
 
         transaction_request =  TransactionRequest(sender=data['sender'], recipient=data['recipient'], amount=data['amount'])
+
         data['session'].add(transaction_request)
+        data['session'].commit()
 
         amount_after_commission =  data['amount'] * (1 - COMMISSION)
         commission = data['amount'] - amount_after_commission
@@ -55,7 +57,5 @@ class MakeTransactionHanler():
         data['recipient'].balance +=  amount_after_commission
 
         data['session'].commit()
-        data['session'].refresh(data['sender'])
-        data['session'].refresh(data['recipient'])
     
         return {"success": f"{amount_after_commission} has been successfuly transfered to wallet {data['recipient'].id}"}
