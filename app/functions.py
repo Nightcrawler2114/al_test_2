@@ -1,6 +1,12 @@
 from sqlalchemy.orm import Session
 
+from pydantic.error_wrappers import ValidationError
+
 from app.db_models import Wallet, TransactionRequest
+
+from app.models import TransactionRequestBase
+
+from .exceptions import WalletNotFoundException, InsufficientFundsException
 
 from .settings import COMMISSION
 
@@ -23,7 +29,9 @@ class MakeTransactionHanler():
 
         data = {
             'amount': amount,
-            'session': session
+            'session': session,
+            'sender_id': sender_id,
+            'recipient_id': recipient_id
         }
 
         data['sender'] = data['session'].query(Wallet).filter_by(id=sender_id).first() 
@@ -35,17 +43,26 @@ class MakeTransactionHanler():
 
         if not data['sender']:
 
-            return {'error': 'Sender wallet does not exists'}
+            # return {'error': 'Sender wallet does not exists'}
+            raise WalletNotFoundException('Sender wallet does not exists')
 
         if not data['recipient']:
 
-            return {'error': 'Recipient wallet does not exists'}
+            # return {'error': 'Recipient wallet does not exists'}
+            raise WalletNotFoundException('Recipient wallet does not exists')
+        
+        if not data['amount'] > data['sender'].balance:
 
-        return {}
+            raise InsufficientFundsException('Insufficient funds')
+
+        try:
+            TransactionRequestBase(sender_id=data['sender_id'], recipient_id=data['recipient_id'], amount=data['amount'])
+        except ValidationError as e:
+            return e
 
     def _make_transaction(self, data: dict) -> dict:
 
-        transaction_request =  TransactionRequest(sender=data['sender'], recipient=data['recipient'], amount=data['amount'])
+        transaction_request = TransactionRequest(sender_id=data['sender_id'], recipient_id=data['recipient_id'], amount=data['amount'])
 
         data['session'].add(transaction_request)
         data['session'].commit()

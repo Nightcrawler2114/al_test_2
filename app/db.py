@@ -4,12 +4,11 @@ from sqlalchemy.orm import sessionmaker
 
 from app.settings import DATABASE_URL, app
 
+
 engine = create_engine(DATABASE_URL)
 
 app.state.Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 app.state.Base = declarative_base()
-
 
 # Dependency
 def get_db():
@@ -18,3 +17,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def get_db_session():
+
+    return app.state.Session()

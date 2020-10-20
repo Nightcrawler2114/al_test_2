@@ -12,7 +12,7 @@ class TransactionRequestBase(BaseModel):
     def check_sender_recipient_not_equal(cls, values):
 
         sender_id, recipient_id = values.get('sender_id'), values.get('recipient_id')
-
+        
         if sender_id == recipient_id:
 
             raise ValueError('Choose different recepient or sender')

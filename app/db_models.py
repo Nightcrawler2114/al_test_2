@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from app.settings import app
 
 
-class Wallet(app.state.Base):
+class Wallet(app.state.Base):   
 
     __tablename__ = "wallets"
 
@@ -27,8 +27,6 @@ class TransactionRequest(app.state.Base):
 
     sender = relationship("Wallet", foreign_keys=[sender_id])
     recipient = relationship("Wallet", foreign_keys=[recipient_id])
-    
-
 
     def __repr__(self) -> str:
         return f'Request ID:{self.id}; Amount: {self.amount}'

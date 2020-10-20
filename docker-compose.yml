@@ -9,7 +9,7 @@ services:
     volumes:
       - postgresql-data:/bitnami/postgresql
     ports:
-      - "5446:5433"
+      - "5446:5432"
     environment:
       - POSTGRESQL_DATABASE=al-test-3
       - POSTGRESQL_USERNAME=superuser
