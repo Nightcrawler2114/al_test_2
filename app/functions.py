@@ -43,22 +43,20 @@ class MakeTransactionHanler():
 
         if not data['sender']:
 
-            # return {'error': 'Sender wallet does not exists'}
             raise WalletNotFoundException('Sender wallet does not exists')
 
         if not data['recipient']:
 
-            # return {'error': 'Recipient wallet does not exists'}
             raise WalletNotFoundException('Recipient wallet does not exists')
-        
-        if not data['amount'] > data['sender'].balance:
-
-            raise InsufficientFundsException('Insufficient funds')
 
         try:
             TransactionRequestBase(sender_id=data['sender_id'], recipient_id=data['recipient_id'], amount=data['amount'])
         except ValidationError as e:
-            return e
+            raise e
+
+        if data['amount'] > data['sender'].balance:
+
+            raise InsufficientFundsException('Insufficient funds')
 
     def _make_transaction(self, data: dict) -> dict:
 

@@ -10,9 +10,10 @@ def main():
 
     session = get_db_session()
 
-    session.add(Wallet(name='test', balance=10))
-    session.add(Wallet(name='test1', balance=15))
-    session.add(Wallet(name='test2', balance=25))
+    session.add(Wallet(id=1, name='test', balance=10))
+    session.add(Wallet(id=2,name='test1', balance=15))
+    session.add(Wallet(id=3,name='test2', balance=25))
+    session.add(Wallet(id=4,name='test3', balance=35))
 
     session.commit()
 

@@ -41,8 +41,8 @@ def test_make_transaction():
     with pytest.raises(WalletNotFoundException):
 
         response = client.post(
-            "/transactions/",
-            json=data 
+            "/transactions",
+            params=data 
         )
 
     # testing with sender does not exists
@@ -55,62 +55,64 @@ def test_make_transaction():
     with pytest.raises(WalletNotFoundException):
 
         response = client.post(
-            "/transactions/",
-            json=data 
+            "/transactions",
+            params=data 
         )
 
     # testing with recipient and sender being the same 
     data = {
-        'sender_id': 1, 
-        'recipient_id': 1, 
+        'sender_id': 3, 
+        'recipient_id': 3, 
         'amount': 10
     }
 
     with pytest.raises(ValueError):
 
         response = client.post(
-            "/transactions/",
-            json=data 
+            "/transactions",
+            params=data 
         )
 
     # testing with negative amount
     data = {
-        'sender_id': 1, 
-        'recipient_id': 2, 
+        'sender_id': 3, 
+        'recipient_id': 4, 
         'amount': -10
     }
 
     with pytest.raises(ValueError):
         response = client.post(
-            "/transactions/",
-            json=data 
+            "/transactions",
+            params=data 
         )
 
     # testing with insuficient funds
     data = {
-        'sender_id': 1, 
-        'recipient_id': 2, 
+        'sender_id': 3, 
+        'recipient_id': 4, 
         'amount': 999999999
     }
 
     with pytest.raises(InsufficientFundsException):
         response = client.post(
-            "/transactions/",
-            json=data 
+            "/transactions",
+            params=data 
         )
+
+        print('!!!', response.json())
 
     # testing with all data being valid
     data = {
-        'sender_id': 1, 
-        'recipient_id': 2, 
+        'sender_id': 3, 
+        'recipient_id': 4, 
         'amount': 5
     }
 
     response = client.post(
-        "/transactions/",
-        json=data 
+        "/transactions",
+        params=data 
     )
 
-    assert response.status == 200
-    assert response.json() == {"success": f"{data['amount'] - data['amount'] * (1 - COMMISSION)} has been successfuly transfered to wallet 2"}
+    assert response.status_code == 200
+    assert response.json() == {"success": f"{data['amount'] - (data['amount'] - data['amount'] * (1 - COMMISSION))} has been successfuly transfered to wallet {data['recipient_id']}"}
 

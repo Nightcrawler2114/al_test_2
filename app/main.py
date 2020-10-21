@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, APIRouter
 
 from typing import List
 
@@ -9,7 +9,7 @@ from app.db import engine, get_db
 from app.db_models import Wallet as WalletModel, TransactionRequest as TransactionRequestModel
 from app.functions import MakeTransactionHanler
 
-from .settings import COMMISSION, app
+from .settings import app
 
 
 app.state.Base.metadata.create_all(bind=engine)
