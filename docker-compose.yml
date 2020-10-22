@@ -1,9 +1,5 @@
 version: '3.8'
 services:
-  al_test:
-    build: ./
-    ports:
-     - 5001:80
   postgresql:
     image: "bitnami/postgresql:latest"
     volumes:
@@ -15,6 +11,13 @@ services:
       - POSTGRESQL_USERNAME=superuser
       - POSTGRESQL_PASSWORD=superuser
       - POSTGRESQL_POSTGRES_PASSWORD=superuser
+  al_test:
+    build: ./
+    ports:
+      - 5001:80
+    depends_on:
+      - postgresql
+    command: ["./wait-for-it.sh", "postgresql:5432", "--", "python", "scripts.py"]
 
 volumes:
   postgresql-data:

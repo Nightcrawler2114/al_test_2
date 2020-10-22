@@ -1,22 +1,32 @@
-from fastapi import Depends
-
-from sqlalchemy.orm import Session
+from sqlalchemy.exc import OperationalError
 
 from app.db import get_db, get_db_session
 from app.db_models import Wallet
+
+import time
+import os
 
 
 def main():
 
     session = get_db_session()
 
-    session.add(Wallet(id=1, name='test', balance=10))
-    session.add(Wallet(id=2,name='test1', balance=15))
-    session.add(Wallet(id=3,name='test2', balance=25))
-    session.add(Wallet(id=4,name='test3', balance=35))
+    id = 1
+    created = 0
 
-    session.commit()
+    while created <= 4:
+        
+        if session.query(Wallet).filter_by(id=id).first():
+            
+            id += 1
+            
+            continue
 
+        session.add(Wallet(id=id, name=f'test{id}', balance=30))
+        session.commit()
+
+        created += 1
+        
     wallets = session.query(Wallet).all()
 
     print(wallets)
@@ -24,4 +34,11 @@ def main():
 
 if __name__ == '__main__':
     
-    main()
+    while True:
+        try:
+            main()
+            break
+        except OperationalError:
+            time.sleep(10)
+
+    os.system('uvicorn app.main:app --reload')
